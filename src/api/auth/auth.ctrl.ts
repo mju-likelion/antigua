@@ -67,11 +67,12 @@ export const register = async (ctx: Context): Promise<void> => {
       activity,
       github,
       infoOpen,
-      emailToken: 'test',
       emailConfirmed: false,
       accountConfirmed: false,
     });
     await user.setPassword(password);
+    user.generateEmailToken();
+    await user.sendEmailToken();
     await user.save();
 
     ctx.body = user.serialize();

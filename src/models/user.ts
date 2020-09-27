@@ -1,4 +1,6 @@
 import bcrypt from 'bcrypt';
+import cryptoRandomString from 'crypto-random-string';
+import sgMail from '@sendgrid/mail';
 import mongoose, { Document, Schema } from 'mongoose';
 
 // mongoose does not suppoort TypeScript officially. Reference below.
@@ -80,6 +82,30 @@ UserSchema.methods.checkPassword = async function (password: string) {
   return result;
 };
 
+UserSchema.methods.generateEmailToken = async function () {
+  const token = cryptoRandomString({ length: 6 });
+  this.emailToken = token;
+};
+
+UserSchema.methods.sendEmailToken = async function () {
+  const msg = {
+    to: this.email,
+    from: 'mail-confirm@mju-likeion.com',
+    subject: '멋쟁이 사자처럼 명지대(자연) 이메일 인증',
+    html: this.emailToken,
+  };
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
+  try {
+    await sgMail.send(msg);
+  } catch (e) {
+    console.error(e);
+
+    if (e.response) {
+      console.error(e.response.body);
+    }
+  }
+};
+
 UserSchema.methods.serialize = function () {
   const data = this.toJSON();
   delete data.password;
@@ -89,6 +115,8 @@ UserSchema.methods.serialize = function () {
 export interface IUser extends IUserSchema {
   setPassword: (password: string) => Promise<void>;
   checkPassword: (password: string) => Promise<boolean>;
+  generateEmailToken: () => void;
+  sendEmailToken: () => Promise<void>;
   serialize: () => Omit<IUserSchema, 'password'>;
 }
 
