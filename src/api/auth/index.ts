@@ -8,6 +8,8 @@ auth.post('/register', authCtrl.register);
 auth.post('/login', authCtrl.login);
 auth.get('/check', authCtrl.check);
 auth.post('/logout', authCtrl.logout);
-auth.patch('/modify', authCtrl.modify);
+
+auth.post('/email-check/:id', authCtrl.emailCheck);
+auth.patch('/modify/:id', authCtrl.modify);
 
 export default auth;

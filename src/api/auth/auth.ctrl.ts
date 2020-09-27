@@ -13,7 +13,7 @@ export const register = async (ctx: Context): Promise<void> => {
       .pattern(/\b\d{11,11}\b/)
       .required(),
     email: Joi.string().email().required(),
-    passwd: Joi.string().min(8).required(),
+    password: Joi.string().min(8).required(),
     gender: Joi.string().valid('male', 'female').required(),
     sid: Joi.string()
       .pattern(/\b\d{8,8}\b/)
@@ -44,7 +44,7 @@ export const register = async (ctx: Context): Promise<void> => {
     name,
     cellPhone,
     email,
-    passwd,
+    password,
     gender,
     sid,
     major,
@@ -55,14 +55,12 @@ export const register = async (ctx: Context): Promise<void> => {
 
   try {
     // TODO: 같은 이메일, 학번, github를 가진 사람이 있는지 확인하고 있으면 409 리턴하기
-    // TODO: 비밀번호 암호화
     // TODO: 이메일 인증 토큰 생성 및 이메일 보내기
 
     const user = new User({
       name,
       cellPhone,
       email,
-      passwd,
       gender,
       sid,
       major,
@@ -73,8 +71,10 @@ export const register = async (ctx: Context): Promise<void> => {
       emailConfirmed: false,
       accountConfirmed: false,
     });
+    await user.setPassword(password);
     await user.save();
-    ctx.body = user;
+
+    ctx.body = user.serialize();
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -90,6 +90,10 @@ export const check = async (): Promise<void> => {
 
 export const logout = async (): Promise<void> => {
   // 로그아웃
+};
+
+export const emailCheck = async (): Promise<void> => {
+  // 이메일 검증
 };
 
 export const modify = async (): Promise<void> => {

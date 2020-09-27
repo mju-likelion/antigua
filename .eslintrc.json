@@ -24,7 +24,8 @@
     "sort-imports": [
       "warn",
       {
-        "allowSeparatedGroups": true
+        "allowSeparatedGroups": true,
+        "memberSyntaxSortOrder": ["single", "multiple", "all", "none"]
       }
     ]
   }
