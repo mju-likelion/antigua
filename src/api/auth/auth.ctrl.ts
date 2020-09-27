@@ -1,11 +1,11 @@
-import { Context } from 'koa';
 import Joi from 'joi';
+import { RouterContext } from 'koa-router';
 
 import User from '../../models/user';
 
 // 회원가입
 // POST /api/auth/register
-export const register = async (ctx: Context): Promise<void> => {
+export const register = async (ctx: RouterContext): Promise<void> => {
   // Request body 검증용 schema
   const schema = Joi.object().keys({
     name: Joi.string().min(2).max(4).required(),
@@ -23,13 +23,13 @@ export const register = async (ctx: Context): Promise<void> => {
       Joi.object({
         generation: Joi.number().required(),
         position: Joi.string().valid('normal', 'manager', 'chief').required(),
-      }),
+      }).required(),
     ),
     github: Joi.string(),
     infoOpen: Joi.object({
       cellPhone: Joi.boolean().required(),
       email: Joi.boolean().required(),
-    }),
+    }).required(),
   });
 
   // 양식이 맞지 않으면 400 에러
@@ -54,8 +54,17 @@ export const register = async (ctx: Context): Promise<void> => {
   } = ctx.request.body;
 
   try {
-    // TODO: 같은 이메일, 학번, github를 가진 사람이 있는지 확인하고 있으면 409 리턴하기
-    // TODO: 이메일 인증 토큰 생성 및 이메일 보내기
+    // 입력받은 것과 같은 폰 번호, 이메일, 학번, github를 가진 사람 찾기
+    const cellPhoneExist = await User.findOne({ cellPhone });
+    const emailExist = await User.findOne({ email });
+    const sidExist = await User.findOne({ sid });
+    const githubExist = await User.findOne({ github });
+
+    // 만약 같은 폰 번호, 이메일, 학번, github를 가진 사람이 있다면
+    if (cellPhoneExist || emailExist || sidExist || githubExist) {
+      ctx.status = 409; // Conflict
+      return;
+    }
 
     const user = new User({
       name,
@@ -93,8 +102,42 @@ export const logout = async (): Promise<void> => {
   // 로그아웃
 };
 
-export const emailCheck = async (): Promise<void> => {
-  // 이메일 검증
+// 이메일 검증
+// POST /api/auth/email-check/:id/:token
+export const emailCheck = async (ctx: RouterContext): Promise<void> => {
+  const { id, token } = ctx.params;
+
+  const schema = Joi.string().length(6);
+  const result = schema.validate(token);
+
+  if (result.error) {
+    ctx.status = 400;
+    ctx.body = result.error;
+    return;
+  }
+
+  try {
+    const user = await User.findById({ _id: id });
+    // 해당 id로 계정이 존재하지 않으면
+    if (!user) {
+      ctx.status = 404; // Not found
+      return;
+    }
+
+    // 이메일 토큰이 맞지 않으면
+    if (user.emailToken !== token) {
+      ctx.status = 401; // Unauthorized
+      return;
+    }
+
+    user.emailToken = '';
+    user.emailConfirmed = true;
+    await user.save();
+
+    ctx.body = user.serialize();
+  } catch (e) {
+    ctx.throw(500, e);
+  }
 };
 
 export const modify = async (): Promise<void> => {
