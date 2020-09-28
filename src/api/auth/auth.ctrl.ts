@@ -129,9 +129,7 @@ export const login = async (ctx: RouterContext): Promise<void> => {
     ctx.body = user.serialize();
 
     const token = user.generateToken();
-    if (!token) {
-      throw Error;
-    }
+    if (!token) throw Error;
 
     ctx.cookies.set('access_token', token, {
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
@@ -142,8 +140,16 @@ export const login = async (ctx: RouterContext): Promise<void> => {
   }
 };
 
-export const check = async (): Promise<void> => {
-  // 로그인 상태 확인
+// 로그인 상태 확인
+// GET /api/auth/check
+export const check = async (ctx: RouterContext): Promise<void> => {
+  const { user } = ctx.state;
+  // 로그인 중이 아니라면
+  if (!user) {
+    ctx.status = 401; // Unauthorized
+    return;
+  }
+  ctx.body = user;
 };
 
 export const logout = async (): Promise<void> => {

@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
 import api from './api';
+import jwtMiddleware from './lib/jwtMiddleware';
 
 // process.env.*을 통해 .env파일에 접근을 허용
 dotenv.config();
@@ -39,6 +40,9 @@ router.use('/api', api.routes());
 
 // request의 body를 받기 위해서 bodyparser 추가
 app.use(bodyParser());
+
+// jwt Token이 있는 경우 로그인 상태를 확인하기 위해
+app.use(jwtMiddleware);
 
 app.use(router.routes()).use(router.allowedMethods());
 
