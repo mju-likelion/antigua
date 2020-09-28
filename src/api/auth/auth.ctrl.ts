@@ -90,8 +90,56 @@ export const register = async (ctx: RouterContext): Promise<void> => {
   }
 };
 
-export const login = async (): Promise<void> => {
-  // 로그인
+// 로그인
+// POST /api/auth/login
+export const login = async (ctx: RouterContext): Promise<void> => {
+  // Request body 검증용 schema
+  const schema = Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(8).required(),
+  });
+
+  // 양식이 맞지 않으면 400 에러
+  const result = schema.validate(ctx.request.body);
+  if (result.error) {
+    ctx.status = 400;
+    ctx.body = result.error;
+    return;
+  }
+
+  const { email, password } = ctx.request.body;
+
+  try {
+    const user = await User.findOne({ email });
+    const valid = await user?.checkPassword(password);
+    // 해당 email을 가진 user가 존재하지 않거나
+    // 비밀번호가 일치하지 않으면
+    if (!user || !valid) {
+      ctx.status = 401; // Unauthorized
+      ctx.body = 'Email is not exist or password is not match.';
+      return;
+    }
+
+    if (!user.emailConfirmed) {
+      ctx.status = 401; // Unauthorized
+      ctx.body = 'You must confirm your email first.';
+      return;
+    }
+
+    ctx.body = user.serialize();
+
+    const token = user.generateToken();
+    if (!token) {
+      throw Error;
+    }
+
+    ctx.cookies.set('access_token', token, {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      httpOnly: true,
+    });
+  } catch (e) {
+    ctx.throw(500, e);
+  }
 };
 
 export const check = async (): Promise<void> => {

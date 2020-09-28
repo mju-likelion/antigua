@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import cryptoRandomString from 'crypto-random-string';
+import jwt from 'jsonwebtoken';
 import sgMail from '@sendgrid/mail';
 import mongoose, { Document, Schema } from 'mongoose';
 
@@ -87,6 +88,25 @@ UserSchema.methods.generateEmailToken = async function () {
   this.emailToken = token;
 };
 
+UserSchema.methods.generateToken = function () {
+  if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET not exist.');
+    return;
+  }
+
+  const token = jwt.sign(
+    {
+      _id: this.id,
+      name: this.name,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: '7d', // expires in 7 days
+    },
+  );
+  return token;
+};
+
 UserSchema.methods.sendEmailToken = async function () {
   const msg = {
     to: this.email,
@@ -116,6 +136,7 @@ export interface IUser extends IUserSchema {
   setPassword: (password: string) => Promise<void>;
   checkPassword: (password: string) => Promise<boolean>;
   generateEmailToken: () => void;
+  generateToken: () => string | void;
   sendEmailToken: () => Promise<void>;
   serialize: () => Omit<IUserSchema, 'password'>;
 }
