@@ -19,12 +19,14 @@ export const register = async (ctx: RouterContext): Promise<void> => {
       .pattern(/\b\d{8,8}\b/)
       .required(),
     major: Joi.string().min(2).required(),
-    activity: Joi.array().items(
-      Joi.object({
-        generation: Joi.number().required(),
-        position: Joi.string().valid('normal', 'manager', 'chief').required(),
-      }).required(),
-    ),
+    activity: Joi.array()
+      .items(
+        Joi.object({
+          generation: Joi.number().required(),
+          position: Joi.string().valid('normal', 'manager', 'chief').required(),
+        }).required(),
+      )
+      .required(),
     github: Joi.string(),
     infoOpen: Joi.object({
       cellPhone: Joi.boolean().required(),
@@ -197,6 +199,52 @@ export const emailCheck = async (ctx: RouterContext): Promise<void> => {
   }
 };
 
-export const modify = async (): Promise<void> => {
-  // 계정 정보 수정
+// 계정 정보 수정
+// PATCH /api/auth/:id
+export const modify = async (ctx: RouterContext): Promise<void> => {
+  const { id } = ctx.params;
+
+  // TODO: 비밀번호 업데이트
+  // TODO: 이메일 업데이트
+
+  // Request body 검증용 schema
+  const schema = Joi.object().keys({
+    name: Joi.string().min(2).max(4),
+    cellPhone: Joi.string().pattern(/\b\d{11,11}\b/),
+    gender: Joi.string().valid('male', 'female'),
+    sid: Joi.string().pattern(/\b\d{8,8}\b/),
+    major: Joi.string().min(2),
+    activity: Joi.array().items(
+      Joi.object({
+        generation: Joi.number().required(),
+        position: Joi.string().valid('normal', 'manager', 'chief').required(),
+      }).required(),
+    ),
+    github: Joi.string(),
+    infoOpen: Joi.object({
+      cellPhone: Joi.boolean().required(),
+      email: Joi.boolean().required(),
+    }),
+  });
+
+  // 양식이 맞지 않으면 400 에러
+  const result = schema.validate(ctx.request.body);
+  if (result.error) {
+    ctx.status = 400;
+    ctx.body = result.error;
+    return;
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(id, ctx.request.body, {
+      new: true, // true면 업데이트 이후의 값을, false면 업데이트 이전의 값을 반환함
+    });
+    if (!user) {
+      ctx.status = 404;
+      return;
+    }
+    ctx.body = user.serialize();
+  } catch (e) {
+    ctx.throw(500, e);
+  }
 };

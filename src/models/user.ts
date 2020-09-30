@@ -8,32 +8,33 @@ import mongoose, { Document, Schema } from 'mongoose';
 // https://medium.com/@agentwhs/complete-guide-for-typescript-for-mongoose-for-node-js-8cc0a7e470c1
 
 const ActivitySchema = new Schema({
-  generation: Number,
+  generation: { type: Number, required: true },
   position: {
     type: String,
     enum: ['normal', 'manager', 'chief'],
+    required: true,
   },
 });
 
 const InfoOpenSchema = new Schema({
-  cellPhone: Boolean,
-  email: Boolean,
+  cellPhone: { type: Boolean, required: true },
+  email: { type: Boolean, required: true },
 });
 
 const UserSchema = new Schema({
-  name: String,
-  cellPhone: { type: String, unique: true },
-  email: { type: String, unique: true },
-  password: String, // 암호화된 비밀번호
-  gender: { type: String, enum: ['male', 'female'] },
-  sid: { type: String, unique: true },
-  major: String,
-  activity: [ActivitySchema],
+  name: { type: String, required: true },
+  cellPhone: { type: String, unique: true, required: true },
+  email: { type: String, unique: true, required: true },
+  password: { type: String, required: true }, // 암호화된 비밀번호
+  gender: { type: String, enum: ['male', 'female'], required: true },
+  sid: { type: String, unique: true, required: true },
+  major: { type: String, required: true },
+  activity: { type: [ActivitySchema], required: true },
   github: { type: String, unique: true },
-  infoOpen: InfoOpenSchema,
+  infoOpen: { type: InfoOpenSchema, required: true },
   emailToken: String, // 이메일 인증용 토큰
-  emailConfirmed: Boolean, // 이메일 인증 여부
-  accountConfirmed: Boolean, // 계정의 인증 여부
+  emailConfirmed: { type: Boolean, required: true }, // 이메일 인증 여부
+  accountConfirmed: { type: Boolean, required: true }, // 계정의 인증 여부
 });
 
 enum Position {
