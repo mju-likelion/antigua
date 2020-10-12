@@ -7,18 +7,14 @@ import mongoose, { Document, Schema } from 'mongoose';
 // mongoose does not suppoort TypeScript officially. Reference below.
 // https://medium.com/@agentwhs/complete-guide-for-typescript-for-mongoose-for-node-js-8cc0a7e470c1
 
+// mongoose schema
 const ActivitySchema = new Schema({
   generation: { type: Number, required: true },
   position: {
     type: String,
-    enum: ['normal', 'manager', 'chief'],
+    enum: ['member', 'manager', 'chief'],
     required: true,
   },
-});
-
-const InfoOpenSchema = new Schema({
-  cellPhone: { type: Boolean, required: true },
-  email: { type: Boolean, required: true },
 });
 
 const UserSchema = new Schema({
@@ -31,14 +27,14 @@ const UserSchema = new Schema({
   major: { type: String, required: true },
   activity: { type: [ActivitySchema], required: true },
   github: { type: String, unique: true },
-  infoOpen: { type: InfoOpenSchema, required: true },
   emailToken: String, // 이메일 인증용 토큰
   emailConfirmed: { type: Boolean, required: true }, // 이메일 인증 여부
   accountConfirmed: { type: Boolean, required: true }, // 계정의 인증 여부
 });
 
+// TypeScript interfaces
 enum Position {
-  normal = 'normal',
+  member = 'member',
   manager = 'manager',
   chief = 'chief',
 }
@@ -46,11 +42,6 @@ enum Position {
 interface IActivitySchema extends Document {
   generation: number;
   position: Position;
-}
-
-interface IInfoOpenSchema extends Document {
-  cellPhone: boolean;
-  email: boolean;
 }
 
 enum Gender {
@@ -68,12 +59,12 @@ interface IUserSchema extends Document {
   major: string;
   activity: IActivitySchema;
   github: string;
-  infoOpen: IInfoOpenSchema;
   emailToken: string;
   emailConfirmed: boolean;
   accountConfirmed: boolean;
 }
 
+// Add methods
 UserSchema.methods.setPassword = async function (password: string) {
   const hash = await bcrypt.hash(password, 10);
   this.password = hash;

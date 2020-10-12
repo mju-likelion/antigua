@@ -23,15 +23,11 @@ export const register = async (ctx: RouterContext): Promise<void> => {
       .items(
         Joi.object({
           generation: Joi.number().required(),
-          position: Joi.string().valid('normal', 'manager', 'chief').required(),
+          position: Joi.string().valid('member', 'manager', 'chief').required(),
         }).required(),
       )
       .required(),
     github: Joi.string(),
-    infoOpen: Joi.object({
-      cellPhone: Joi.boolean().required(),
-      email: Joi.boolean().required(),
-    }).required(),
   });
 
   // 양식이 맞지 않으면 400 에러
@@ -52,7 +48,6 @@ export const register = async (ctx: RouterContext): Promise<void> => {
     major,
     activity,
     github,
-    infoOpen,
   } = ctx.request.body;
 
   try {
@@ -77,7 +72,6 @@ export const register = async (ctx: RouterContext): Promise<void> => {
       major,
       activity,
       github,
-      infoOpen,
       emailConfirmed: false,
       accountConfirmed: false,
     });
@@ -221,10 +215,6 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
       }).required(),
     ),
     github: Joi.string(),
-    infoOpen: Joi.object({
-      cellPhone: Joi.boolean().required(),
-      email: Joi.boolean().required(),
-    }),
   });
 
   // 양식이 맞지 않으면 400 에러
