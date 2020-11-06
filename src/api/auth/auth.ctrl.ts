@@ -72,8 +72,6 @@ export const register = async (ctx: RouterContext): Promise<void> => {
       major,
       activity,
       github,
-      emailConfirmed: false,
-      accountConfirmed: false,
     });
     await user.setPassword(password);
     user.generateEmailToken();

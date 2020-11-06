@@ -17,20 +17,29 @@ const ActivitySchema = new Schema({
   },
 });
 
-const UserSchema = new Schema({
-  name: { type: String, required: true },
-  cellPhone: { type: String, unique: true, required: true },
-  email: { type: String, unique: true, required: true },
-  password: { type: String, required: true }, // 암호화된 비밀번호
-  gender: { type: String, enum: ['male', 'female'], required: true },
-  sid: { type: String, unique: true, required: true },
-  major: { type: String, required: true },
-  activity: { type: [ActivitySchema], required: true },
-  github: { type: String, unique: true },
-  emailToken: String, // 이메일 인증용 토큰
-  emailConfirmed: { type: Boolean, required: true }, // 이메일 인증 여부
-  accountConfirmed: { type: Boolean, required: true }, // 계정의 인증 여부
-});
+const UserSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    cellPhone: { type: String, unique: true, required: true },
+    personalEmail: { type: String, unique: true, required: true },
+    likelionEmail: { type: String, unique: true },
+    password: { type: String, required: true }, // 암호화된 비밀번호
+    gender: { type: String, enum: ['male', 'female'], required: true },
+    sid: { type: String, unique: true, required: true },
+    major: { type: String, required: true },
+    activity: { type: [ActivitySchema], required: true },
+    github: { type: String, unique: true },
+    emailToken: String, // 이메일 인증용 토큰
+    emailConfirmed: { type: Boolean, required: true, default: false }, // 이메일 인증 여부
+    accountConfirmed: { type: Boolean, required: true, default: false }, // 계정의 인증 여부
+  },
+  {
+    timestamps: {
+      createdAt: 'createdAt',
+      updatedAt: 'updatedAt',
+    },
+  },
+);
 
 // TypeScript interfaces
 enum Position {
