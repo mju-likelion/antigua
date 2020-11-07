@@ -12,7 +12,8 @@ export const register = async (ctx: RouterContext): Promise<void> => {
     cellPhone: Joi.string()
       .pattern(/\b\d{11,11}\b/)
       .required(),
-    email: Joi.string().email().required(),
+    personalEmail: Joi.string().email().required(),
+    likelionEmail: Joi.string().pattern(/@likelion.org\b/),
     password: Joi.string().min(8).required(),
     gender: Joi.string().valid('male', 'female').required(),
     sid: Joi.string()
@@ -41,7 +42,8 @@ export const register = async (ctx: RouterContext): Promise<void> => {
   const {
     name,
     cellPhone,
-    email,
+    personalEmail,
+    likelionEmail,
     password,
     gender,
     sid,
@@ -53,12 +55,19 @@ export const register = async (ctx: RouterContext): Promise<void> => {
   try {
     // 입력받은 것과 같은 폰 번호, 이메일, 학번, github를 가진 사람 찾기
     const cellPhoneExist = await User.findOne({ cellPhone });
-    const emailExist = await User.findOne({ email });
+    const personalEmailExist = await User.findOne({ personalEmail });
+    const likelionEmailExist = await User.findOne({ likelionEmail });
     const sidExist = await User.findOne({ sid });
     const githubExist = await User.findOne({ github });
 
     // 만약 같은 폰 번호, 이메일, 학번, github를 가진 사람이 있다면
-    if (cellPhoneExist || emailExist || sidExist || githubExist) {
+    if (
+      cellPhoneExist ||
+      personalEmailExist ||
+      likelionEmailExist ||
+      sidExist ||
+      githubExist
+    ) {
       ctx.status = 409; // Conflict
       return;
     }
@@ -66,7 +75,8 @@ export const register = async (ctx: RouterContext): Promise<void> => {
     const user = new User({
       name,
       cellPhone,
-      email,
+      personalEmail,
+      likelionEmail,
       gender,
       sid,
       major,

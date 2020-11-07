@@ -110,7 +110,7 @@ UserSchema.methods.generateToken = function () {
 
 UserSchema.methods.sendEmailToken = async function () {
   const msg = {
-    to: this.email,
+    to: this.personalEmail,
     from: 'mail-confirm@mju-likeion.com',
     subject: '멋쟁이 사자처럼 명지대(자연) 이메일 인증',
     html: this.emailToken,
