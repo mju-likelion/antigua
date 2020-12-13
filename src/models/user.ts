@@ -32,7 +32,6 @@ const UserSchema = new Schema(
     emailToken: String, // 이메일 인증용 토큰
     emailConfirmed: { type: Boolean, required: true, default: false }, // 이메일 인증 여부
     accountConfirmed: { type: Boolean, required: true, default: false }, // 계정의 인증 여부
-    company: { type: String }, // 소속 회사
   },
   {
     timestamps: {
@@ -72,7 +71,6 @@ interface IUserSchema extends Document {
   emailToken: string;
   emailConfirmed: boolean;
   accountConfirmed: boolean;
-  company?: string;
 }
 
 // Add methods
