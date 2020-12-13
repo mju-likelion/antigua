@@ -2,7 +2,7 @@ import { model, Schema, Document } from 'mongoose';
 
 const CommentSchema = new Schema(
   {
-    author: { type: String, required: true },
+    author: { type: String, ref: 'User', required: true },
     post: { type: Schema.Types.ObjectId, ref: 'Homework', required: true },
   },
   {
