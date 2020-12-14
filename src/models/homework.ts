@@ -3,7 +3,7 @@ import { model, Schema, Document } from 'mongoose';
 // mongoose schema
 const HomeworkSchema = new Schema(
   {
-    author: { type: String, ref: 'User', required: true },
+    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
   },
