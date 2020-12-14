@@ -1,0 +1,3 @@
+{
+  "*.ts": ["eslint", "pretty-quick --staged"]
+}
