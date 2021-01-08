@@ -18,7 +18,7 @@ const CommentSchema = new Schema(
 interface ICommentSchema extends Document {
   author: string;
   post: string;
-	parent: string;
+	parent?: string;
 }
 
 const Comment = model<ICommentSchema>('Comment', CommentSchema);
