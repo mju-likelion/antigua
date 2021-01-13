@@ -4,6 +4,7 @@
     "node": true
   },
   "extends": [
+    "airbnb-base",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier"
@@ -13,20 +14,35 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "import"],
   "rules": {
-    "indent": ["warn", 2],
-    "linebreak-style": ["warn", "unix"],
-    "no-console": "off",
-    "no-unused-vars": "warn",
-    "quotes": ["warn", "single"],
-    "semi": ["warn", "always"],
-    "sort-imports": [
-      "warn",
+    "import/no-anonymous-default-export": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/order": [
+      "error",
       {
-        "allowSeparatedGroups": true,
-        "memberSyntaxSortOrder": ["single", "multiple", "all", "none"]
+        "groups": ["builtin", "external", "internal", "parent", "sibling"],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": false
+        }
       }
-    ]
+    ],
+    "indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "no-console": "error",
+    "no-unused-vars": "error",
+    "react/react-in-jsx-scope": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
   }
 }
