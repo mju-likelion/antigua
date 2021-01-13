@@ -21,11 +21,8 @@ const PostSchema = new Schema(
 );
 
 // TypeScript interfaces
-enum Kinds {
-  post = 'post',
-  announcement = 'announcement',
-  homework = 'homework',
-}
+type Kinds = 'post' | 'announcement' | 'homework';
+
 interface IPostSchema extends Document {
   kinds: Kinds;
   author: Schema.Types.ObjectId;

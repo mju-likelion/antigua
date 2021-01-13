@@ -1,7 +1,7 @@
+import sgMail from '@sendgrid/mail';
 import bcrypt from 'bcrypt';
 import cryptoRandomString from 'crypto-random-string';
 import jwt from 'jsonwebtoken';
-import sgMail from '@sendgrid/mail';
 import mongoose, { Document, Schema } from 'mongoose';
 
 // mongoose does not suppoort TypeScript officially. Reference below.
@@ -43,22 +43,14 @@ const UserSchema = new Schema(
 );
 
 // TypeScript interfaces
-enum Position {
-  member = 'member',
-  manager = 'manager',
-  president = 'president',
-  vicepresident = 'vicepresident',
-}
+type Position = 'member' | 'manager' | 'president' | 'vicepresident';
 
 interface IActivitySchema extends Document {
   generation: number;
   position: Position;
 }
 
-enum Gender {
-  male = 'male',
-  female = 'female',
-}
+type Gender = 'male' | 'female';
 
 interface IUserSchema extends Document {
   name: string;
@@ -92,10 +84,10 @@ UserSchema.methods.generateEmailToken = async function () {
   this.emailToken = token;
 };
 
-UserSchema.methods.generateToken = function () {
+UserSchema.methods.generateToken = function (): any {
   if (!process.env.JWT_SECRET) {
     console.error('JWT_SECRET not exist.');
-    return;
+    return false;
   }
 
   const token = jwt.sign(
