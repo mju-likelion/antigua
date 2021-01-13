@@ -84,7 +84,7 @@ UserSchema.methods.generateEmailToken = async function () {
   this.emailToken = token;
 };
 
-UserSchema.methods.generateToken = function (): any {
+UserSchema.methods.generateToken = function (): boolean | string {
   if (!process.env.JWT_SECRET) {
     console.error('JWT_SECRET not exist.');
     return false;

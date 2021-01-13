@@ -1,6 +1,7 @@
 import Router from 'koa-router';
 
 import checkObjectId from '../../lib/checkObjectId';
+
 import * as authCtrl from './auth.ctrl';
 
 const auth = new Router();

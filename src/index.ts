@@ -1,7 +1,7 @@
-import Koa from 'koa';
-import Router from 'koa-router';
-import bodyParser from 'koa-bodyparser';
 import dotenv from 'dotenv';
+import Koa from 'koa';
+import bodyParser from 'koa-bodyparser';
+import Router from 'koa-router';
 import mongoose from 'mongoose';
 
 import api from './api';
