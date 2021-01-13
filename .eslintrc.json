@@ -36,7 +36,7 @@
         "SwitchCase": 1
       }
     ],
-    "no-console": "error",
+    "no-console": "off",
     "no-unused-vars": "error",
     "react/react-in-jsx-scope": "off"
   },
