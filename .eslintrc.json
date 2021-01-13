@@ -16,6 +16,7 @@
   },
   "plugins": ["@typescript-eslint", "import"],
   "rules": {
+    "consistent-return": "off",
     "import/no-anonymous-default-export": "off",
     "import/no-extraneous-dependencies": "off",
     "import/order": [
@@ -27,6 +28,13 @@
           "order": "asc",
           "caseInsensitive": false
         }
+      }
+    ],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "ts": "never"
       }
     ],
     "indent": [
