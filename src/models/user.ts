@@ -12,7 +12,7 @@ const ActivitySchema = new Schema({
   generation: { type: Number, required: true },
   position: {
     type: String,
-    enum: ['member', 'manager', 'chief'],
+    enum: ['member', 'manager', 'president', 'vicepresident'],
     required: true,
   },
 });

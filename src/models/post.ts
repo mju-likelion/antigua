@@ -1,8 +1,13 @@
 import { model, Schema, Document } from 'mongoose';
 
 // mongoose schema
-const HomeworkSchema = new Schema(
+const PostSchema = new Schema(
   {
+    kinds: {
+      type: String,
+      enum: ['post', 'announcement', 'homework'],
+      required: true,
+    },
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
@@ -16,12 +21,13 @@ const HomeworkSchema = new Schema(
 );
 
 // TypeScript interfaces
-interface IHomeworkSchema extends Document {
+interface IPostSchema extends Document {
+  kinds: string;
   author: string;
   title: string;
   content: string;
 }
 
-const Homework = model<IHomeworkSchema>('Homework', HomeworkSchema);
+const Post = model<IPostSchema>('Post', PostSchema);
 
-export default Homework;
+export default Post;
