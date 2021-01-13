@@ -46,7 +46,8 @@ const UserSchema = new Schema(
 enum Position {
   member = 'member',
   manager = 'manager',
-  chief = 'chief',
+  president = 'president',
+  vicepresident = 'vicepresident',
 }
 
 interface IActivitySchema extends Document {
