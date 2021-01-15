@@ -176,6 +176,42 @@ UserSchema.methods.sendNotiToAdmin = async function () {
   }
 };
 
+UserSchema.methods.approve = async function () {
+  const { MAILER_EMAIL, SENDGRID_API_KEY } = process.env;
+
+  sgMail.setApiKey(SENDGRID_API_KEY || '');
+
+  const msg = {
+    to: this.personalEmail,
+    from: MAILER_EMAIL as string,
+    subject: '멋쟁이 사자처럼 명지대(자연) 회원 승인 완료',
+    html: `
+      <p>안녕하세요 <strong>${this.name}</strong>님,</p>
+      <br />
+      <p><strong>${this.name}</strong>님의 계정이 정상적으로 승인되었습니다.</p>
+      <p>자세한 안내와 공지는 홈페이지 공지사항을 참고해주십시오.</p>
+      <br />
+      <p>감사합니다.</p>
+      <br />
+      <p>멋쟁이 사자처럼 명지대(자연) 운영진 올림.</p>
+    `,
+  };
+
+  this.accountConfirmed = true;
+
+  try {
+    await this.save();
+
+    await sgMail.send(msg);
+  } catch (e) {
+    console.error(e);
+
+    if (e.response) {
+      console.error(e.response.body);
+    }
+  }
+};
+
 UserSchema.methods.serialize = function () {
   const data = this.toJSON();
   delete data.password;
@@ -189,6 +225,7 @@ export interface IUser extends IUserSchema {
   generateToken: () => string | void;
   sendEmailToken: () => Promise<void>;
   sendNotiToAdmin: () => Promise<void>;
+  approve: () => Promise<void>;
   serialize: () => Omit<IUserSchema, 'password'>;
 }
 
