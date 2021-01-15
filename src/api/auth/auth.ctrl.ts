@@ -24,7 +24,9 @@ export const register = async (ctx: RouterContext): Promise<void> => {
       .items(
         Joi.object({
           generation: Joi.number().required(),
-          position: Joi.string().valid('member', 'manager', 'chief').required(),
+          position: Joi.string()
+            .valid('member', 'manager', 'president', 'vicepresident')
+            .required(),
         }).required(),
       )
       .required(),
@@ -168,7 +170,7 @@ export const logout = async (ctx: RouterContext): Promise<void> => {
 export const emailCheck = async (ctx: RouterContext): Promise<void> => {
   const { id, token } = ctx.params;
 
-  const schema = Joi.string().length(6);
+  const schema = Joi.string().length(32);
   const result = schema.validate(token);
 
   if (result.error) {
@@ -193,9 +195,15 @@ export const emailCheck = async (ctx: RouterContext): Promise<void> => {
 
     user.emailToken = '';
     user.emailConfirmed = true;
+    await user.sendNotiToAdmin();
     await user.save();
 
-    ctx.body = user.serialize();
+    ctx.body = `
+      <script>
+        alert("이메일 인증이 완료되었습니다!");
+        window.close();
+      </script>
+  `;
   } catch (e) {
     ctx.throw(500, e);
   }

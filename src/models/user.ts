@@ -1,4 +1,5 @@
 import sgMail from '@sendgrid/mail';
+import { WebClient } from '@slack/web-api';
 import bcrypt from 'bcrypt';
 import cryptoRandomString from 'crypto-random-string';
 import jwt from 'jsonwebtoken';
@@ -80,7 +81,7 @@ UserSchema.methods.checkPassword = async function (password: string) {
 };
 
 UserSchema.methods.generateEmailToken = async function () {
-  const token = cryptoRandomString({ length: 6 });
+  const token = cryptoRandomString({ length: 32 });
   this.emailToken = token;
 };
 
@@ -104,15 +105,68 @@ UserSchema.methods.generateToken = function (): boolean | string {
 };
 
 UserSchema.methods.sendEmailToken = async function () {
+  /* eslint-disable no-underscore-dangle */
   const msg = {
     to: this.personalEmail,
-    from: 'mail-confirm@mju-likeion.com',
-    subject: '멋쟁이 사자처럼 명지대(자연) 이메일 인증',
-    html: this.emailToken,
+    from: `${process.env.MAILER_EMAIL}`,
+    subject: '멋쟁이 사자처럼 at 명지대(자연) 이메일 인증',
+    html: ` 
+    <h1>안녕하세요, ${this.name}님!</h1>
+    <hr />
+    <br />
+    <p>멋쟁이 사자처럼 at 명지대(자연) 회원가입을 환영합니다!</p>
+    <p>버튼을 눌러 이메일 인증을 완료하여 주세요 :) </p>
+    <br />
+    <div style="text-align: center">
+      <a href="${process.env.APP_DOMAIN}/api/auth/email-check/${this._id}/${this.emailToken}">
+        <input type="button" value="Confirm" style="border:none; padding:1.5em; font-weight:bold; color:#ffffff; background-color:#F39925">
+      </a>
+    </div>
+    <br />
+    <hr />
+    <br />
+    <p> - 본 메일은 멋쟁이사자처럼 명지대(자연) 회원가입 이메일 인증을 위해 발송되었습니다.</p>
+    `,
   };
+  /* eslint-enable no-underscore-dangle */
   sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
   try {
     await sgMail.send(msg);
+    console.log('send mail success!');
+  } catch (e) {
+    console.error(e);
+
+    if (e.response) {
+      console.error(e.response.body);
+    }
+  }
+};
+
+UserSchema.methods.sendNotiToAdmin = async function () {
+  // Slack api Token
+  const token = process.env.SLACK_TOKEN;
+  const web = new WebClient(token);
+  // Slack Channel ID
+  const conversationId = `${process.env.SLACK_CHANNEL_ID}`;
+
+  // Mail to President
+  const msg = {
+    to: `${process.env.ADMIN_EMAIL}`,
+    from: `${process.env.MAILER_EMAIL}`,
+    subject: '멋쟁이 사자처럼 명지대(자연) 회원가입 요청',
+    html: `전공: ${this.major}, 학번: ${this.sid}, 이름: ${this.name}님이 이메일 인증을 완료하였습니다. 관리자페이지에서 회원가입을 승인 해주세요.`,
+  };
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
+
+  try {
+    // send mail to admin
+    await sgMail.send(msg);
+    // send slack message to channel
+    await web.chat.postMessage({
+      channel: conversationId,
+      text: `전공: ${this.major}, 학번: ${this.sid}, 이름: ${this.name}님이 이메일 인증을 완료하였습니다.`,
+    });
+    console.log(`send mail, success!`);
   } catch (e) {
     console.error(e);
 
@@ -134,6 +188,7 @@ export interface IUser extends IUserSchema {
   generateEmailToken: () => void;
   generateToken: () => string | void;
   sendEmailToken: () => Promise<void>;
+  sendNotiToAdmin: () => Promise<void>;
   serialize: () => Omit<IUserSchema, 'password'>;
 }
 
