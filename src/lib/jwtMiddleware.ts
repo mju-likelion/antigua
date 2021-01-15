@@ -1,10 +1,11 @@
+/* eslint-disable no-underscore-dangle */
 import jwt from 'jsonwebtoken';
 import { Context, Next } from 'koa';
 
 import User from '../models/user';
 
 type DecodedJWT = {
-  id: string;
+  _id: string;
   name: string;
   iat: number;
   exp: number;
@@ -21,14 +22,14 @@ const jwtMiddleware = async (ctx: Context, next: Next): Promise<any> => {
     }
     const decoded = <DecodedJWT>jwt.verify(token, process.env.JWT_SECRET);
     ctx.state.user = {
-      id: decoded.id,
+      id: decoded._id,
       name: decoded.name,
     };
 
     // token의 남은 유효 기간이 3.5일 미만이면 재발급
     const now = Math.floor(Date.now() / 1000);
     if (decoded.exp - now < 60 * 60 * 24 * 3.5) {
-      const user = await User.findById(decoded.id);
+      const user = await User.findById(decoded._id);
       const reGenerateToken = user?.generateToken();
 
       if (!user || !reGenerateToken) throw Error;
