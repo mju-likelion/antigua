@@ -116,7 +116,7 @@ export const login = async (ctx: RouterContext): Promise<void> => {
   const { email, password } = ctx.request.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ personalEmail: email });
     const valid = await user?.checkPassword(password);
     // 해당 email을 가진 user가 존재하지 않거나
     // 비밀번호가 일치하지 않으면
