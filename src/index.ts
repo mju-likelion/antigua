@@ -1,3 +1,4 @@
+import consola from 'consola';
 import dotenv from 'dotenv';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
@@ -25,7 +26,7 @@ async function connectDB() {
         useUnifiedTopology: true,
       },
     );
-    console.log('Connected to MongoDB');
+    consola.success('Connected to MongoDB');
   } catch (e) {
     console.error(e);
   }
@@ -48,5 +49,5 @@ app.use(router.routes()).use(router.allowedMethods());
 
 const port = PORT || 4000;
 app.listen(port, () => {
-  console.log(`Listening to port ${port}`);
+  consola.success(`Listening to port ${port}`);
 });
