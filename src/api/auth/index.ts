@@ -12,7 +12,7 @@ auth.post('/login', authCtrl.login);
 auth.get('/check', checkLoggedIn, authCtrl.check);
 auth.post('/logout', checkLoggedIn, authCtrl.logout);
 
-auth.get('/email-check/:id/:token', checkObjectId, authCtrl.emailCheck);
+auth.post('/email-check/:id/:token', checkObjectId, authCtrl.emailCheck);
 auth.patch('/modify/:id', checkLoggedIn, checkObjectId, authCtrl.modify);
 
 export default auth;
