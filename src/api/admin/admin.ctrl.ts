@@ -26,7 +26,7 @@ export const approve = async (ctx: RouterContext): Promise<void> => {
     const user = await User.findById(id);
 
     if (!user) {
-      ctx.status = 400;
+      ctx.status = 404;
       return;
     }
 
