@@ -214,7 +214,18 @@ UserSchema.methods.approve = async function () {
 
 UserSchema.methods.serialize = function () {
   const data = this.toJSON();
-  delete data.password;
+  const deleteItemArray = [
+    'emailConfirmed',
+    'accountConfirmed',
+    'gender',
+    'password',
+    'emailToken',
+    'createdAt',
+    '__v',
+  ];
+
+  // TODO: MongoDB TimeZone 관련 이슈 수정 예정
+  deleteItemArray.map(deleteItem => delete data[deleteItem]);
   return data;
 };
 
