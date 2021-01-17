@@ -198,12 +198,7 @@ export const emailCheck = async (ctx: RouterContext): Promise<void> => {
     await user.sendNotiToAdmin();
     await user.save();
 
-    ctx.body = `
-      <script>
-        alert("이메일 인증이 완료되었습니다!");
-        window.close();
-      </script>
-  `;
+    ctx.body = user.serialize();
   } catch (e) {
     ctx.throw(500, e);
   }
