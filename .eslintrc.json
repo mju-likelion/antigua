@@ -46,7 +46,8 @@
     ],
     "no-console": "off",
     "no-unused-vars": "error",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "no-underscore-dangle": "off"
   },
   "settings": {
     "import/resolver": {
