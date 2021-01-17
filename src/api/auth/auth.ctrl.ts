@@ -3,6 +3,25 @@ import { RouterContext } from 'koa-router';
 
 import User from '../../models/user';
 
+// 특정 회원정보 조회
+// GET / api/auth/user-detail/:id
+export const userDetail = async (ctx: RouterContext): Promise<void> => {
+  const { id } = ctx.params;
+
+  try {
+    const user = await User.findById({ _id: id });
+    // 해당 id로 계정이 존재하지 않으면
+    if (!user) {
+      ctx.status = 404; // Not found
+      return;
+    }
+
+    ctx.body = user.serialize();
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
 // 회원가입
 // POST /api/auth/register
 export const register = async (ctx: RouterContext): Promise<void> => {
