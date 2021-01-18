@@ -7,6 +7,7 @@ import * as authCtrl from './auth.ctrl';
 
 const auth = new Router();
 
+auth.get('/user-list', checkLoggedIn, authCtrl.userList);
 auth.get('/user-detail/:id', checkLoggedIn, checkObjectId, authCtrl.userDetail);
 auth.post('/register', authCtrl.register);
 auth.post('/login', authCtrl.login);
