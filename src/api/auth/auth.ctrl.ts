@@ -39,7 +39,7 @@ export const userList = async (ctx: RouterContext): Promise<void> => {
 };
 
 // 특정 회원정보 조회
-// GET / api/auth/user-detail/:id
+// GET /api/auth/user-detail/:id
 export const userDetail = async (ctx: RouterContext): Promise<void> => {
   const { id } = ctx.params;
 
