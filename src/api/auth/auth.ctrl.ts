@@ -1,7 +1,42 @@
 import Joi from 'joi';
 import { RouterContext } from 'koa-router';
 
-import User from '../../models/user';
+import User, { IUser } from '../../models/user';
+
+// 회원정보 조회
+// GET /api/auth/user-list
+export const userList = async (ctx: RouterContext): Promise<void> => {
+  const numPage = 10;
+
+  const page = parseInt(ctx.query.page || '1', 10);
+
+  if (page < 1) {
+    ctx.status = 400;
+    return;
+  }
+
+  try {
+    const users =
+      (await User.find({
+        accountConfirmed: true,
+      })
+        .limit(numPage)
+        .skip((page - 1) * numPage)
+        .exec()) || [];
+
+    ctx.body = users.map((user: IUser) => {
+      const userObj = user.serialize();
+      return {
+        _id: userObj._id,
+        name: userObj.name,
+        activity: userObj.activity,
+        major: userObj.major,
+      };
+    });
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
 
 // 특정 회원정보 조회
 // GET / api/auth/user-detail/:id
