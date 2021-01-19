@@ -1,5 +1,6 @@
 import { WebClient } from '@slack/web-api';
 import bcrypt from 'bcrypt';
+import console from 'consola';
 import cryptoRandomString from 'crypto-random-string';
 import jwt from 'jsonwebtoken';
 import mongoose, { Document, Schema } from 'mongoose';
@@ -148,7 +149,7 @@ UserSchema.methods.sendEmailToken = async function () {
 
   try {
     await transporter.sendMail(msg);
-    console.log('send mail, success!');
+    console.success('send mail, success!');
   } catch (e) {
     console.error(e);
   }
@@ -204,7 +205,7 @@ UserSchema.methods.sendNotiToAdmin = async function () {
       channel: SLACK_CHANNEL_ID as string,
       text: `전공: ${this.major}, 학번: ${this.sid}, 이름: ${this.name}님이 이메일 인증을 완료하였습니다.`,
     });
-    console.log('send mail, success!');
+    console.success('send mail, success!');
   } catch (e) {
     console.error(e);
   }
