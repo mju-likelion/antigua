@@ -164,6 +164,7 @@ UserSchema.methods.sendNotiToAdmin = async function () {
     MAIL_SENDER_IS_SECURE,
     MAIL_SENDER_EMAIL,
     MAIL_SENDER_PASSWORD,
+    ADMIN_EMAIL,
   } = process.env;
 
   const transporter = nodemailer.createTransport({
@@ -183,7 +184,7 @@ UserSchema.methods.sendNotiToAdmin = async function () {
 
   // Mail to President
   const msg = {
-    to: MAIL_SENDER_EMAIL,
+    to: ADMIN_EMAIL,
     from: MAIL_SENDER_EMAIL,
     subject: '멋쟁이 사자처럼 명지대(자연) 회원가입 요청',
     html: `
