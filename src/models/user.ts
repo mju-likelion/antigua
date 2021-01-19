@@ -1,9 +1,9 @@
-import sgMail from '@sendgrid/mail';
 import { WebClient } from '@slack/web-api';
 import bcrypt from 'bcrypt';
 import cryptoRandomString from 'crypto-random-string';
 import jwt from 'jsonwebtoken';
 import mongoose, { Document, Schema } from 'mongoose';
+import nodemailer from 'nodemailer';
 
 // mongoose does not suppoort TypeScript officially. Reference below.
 // https://medium.com/@agentwhs/complete-guide-for-typescript-for-mongoose-for-node-js-8cc0a7e470c1
@@ -105,22 +105,39 @@ UserSchema.methods.generateToken = function (): boolean | string {
 };
 
 UserSchema.methods.sendEmailToken = async function () {
-  /* eslint-disable no-underscore-dangle */
+  const {
+    MAIL_SENDER_SERVICE,
+    MAIL_SENDER_HOST,
+    MAIL_SENDER_PORT,
+    MAIL_SENDER_IS_SECURE,
+    MAIL_SENDER_EMAIL,
+    MAIL_SENDER_PASSWORD,
+  } = process.env;
+
+  const transporter = nodemailer.createTransport({
+    service: MAIL_SENDER_SERVICE,
+    host: MAIL_SENDER_HOST,
+    port: parseInt(MAIL_SENDER_PORT as string, 10),
+    secure: MAIL_SENDER_IS_SECURE === 'true',
+    auth: {
+      user: MAIL_SENDER_EMAIL,
+      pass: MAIL_SENDER_PASSWORD,
+    },
+  });
+
   const msg = {
     to: this.personalEmail,
-    from: `${process.env.MAILER_EMAIL}`,
+    from: MAIL_SENDER_EMAIL,
     subject: '멋쟁이 사자처럼 at 명지대(자연) 이메일 인증',
     html: ` 
     <h1>안녕하세요, ${this.name}님!</h1>
     <hr />
     <br />
     <p>멋쟁이 사자처럼 at 명지대(자연) 회원가입을 환영합니다!</p>
-    <p>버튼을 눌러 이메일 인증을 완료하여 주세요 :) </p>
+    <p>해당 토큰으로 인증을 진행해주세요! </p>
     <br />
     <div style="text-align: center">
-      <a href="${process.env.APP_DOMAIN}/api/auth/email-check/${this._id}/${this.emailToken}">
-        <input type="button" value="Confirm" style="border:none; padding:1.5em; font-weight:bold; color:#ffffff; background-color:#F39925">
-      </a>
+      ${this.emailToken}
     </div>
     <br />
     <hr />
@@ -128,62 +145,94 @@ UserSchema.methods.sendEmailToken = async function () {
     <p> - 본 메일은 멋쟁이사자처럼 명지대(자연) 회원가입 이메일 인증을 위해 발송되었습니다.</p>
     `,
   };
-  /* eslint-enable no-underscore-dangle */
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
+
   try {
-    await sgMail.send(msg);
-    console.log('send mail success!');
+    await transporter.sendMail(msg);
+    console.log('send mail, success!');
   } catch (e) {
     console.error(e);
-
-    if (e.response) {
-      console.error(e.response.body);
-    }
   }
 };
 
 UserSchema.methods.sendNotiToAdmin = async function () {
+  const {
+    SLACK_TOKEN,
+    SLACK_CHANNEL_ID,
+    MAIL_SENDER_SERVICE,
+    MAIL_SENDER_HOST,
+    MAIL_SENDER_PORT,
+    MAIL_SENDER_IS_SECURE,
+    MAIL_SENDER_EMAIL,
+    MAIL_SENDER_PASSWORD,
+  } = process.env;
+
+  const transporter = nodemailer.createTransport({
+    service: MAIL_SENDER_SERVICE,
+    host: MAIL_SENDER_HOST,
+    port: parseInt(MAIL_SENDER_PORT as string, 10),
+    secure: MAIL_SENDER_IS_SECURE === 'true',
+    auth: {
+      user: MAIL_SENDER_EMAIL,
+      pass: MAIL_SENDER_PASSWORD,
+    },
+  });
+
   // Slack api Token
-  const token = process.env.SLACK_TOKEN;
+  const token = SLACK_TOKEN;
   const web = new WebClient(token);
-  // Slack Channel ID
-  const conversationId = `${process.env.SLACK_CHANNEL_ID}`;
 
   // Mail to President
   const msg = {
-    to: `${process.env.ADMIN_EMAIL}`,
-    from: `${process.env.MAILER_EMAIL}`,
+    to: MAIL_SENDER_EMAIL,
+    from: MAIL_SENDER_EMAIL,
     subject: '멋쟁이 사자처럼 명지대(자연) 회원가입 요청',
-    html: `전공: ${this.major}, 학번: ${this.sid}, 이름: ${this.name}님이 이메일 인증을 완료하였습니다. 관리자페이지에서 회원가입을 승인 해주세요.`,
+    html: `
+      ${this.name} 님이 이메일 인증을 완료하였습니다.
+      <br />
+      관리자페이지에서 회원가입을 승인 해주세요.
+      <br />
+      전공: ${this.major}, 학번: ${this.sid}, 이름: ${this.name}
+    `,
   };
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
   try {
     // send mail to admin
-    await sgMail.send(msg);
+    await transporter.sendMail(msg);
     // send slack message to channel
     await web.chat.postMessage({
-      channel: conversationId,
+      channel: SLACK_CHANNEL_ID as string,
       text: `전공: ${this.major}, 학번: ${this.sid}, 이름: ${this.name}님이 이메일 인증을 완료하였습니다.`,
     });
-    console.log(`send mail, success!`);
+    console.log('send mail, success!');
   } catch (e) {
     console.error(e);
-
-    if (e.response) {
-      console.error(e.response.body);
-    }
   }
 };
 
 UserSchema.methods.approve = async function () {
-  const { MAILER_EMAIL, SENDGRID_API_KEY } = process.env;
+  const {
+    MAIL_SENDER_SERVICE,
+    MAIL_SENDER_HOST,
+    MAIL_SENDER_PORT,
+    MAIL_SENDER_IS_SECURE,
+    MAIL_SENDER_EMAIL,
+    MAIL_SENDER_PASSWORD,
+  } = process.env;
 
-  sgMail.setApiKey(SENDGRID_API_KEY || '');
+  const transporter = nodemailer.createTransport({
+    service: MAIL_SENDER_SERVICE,
+    host: MAIL_SENDER_HOST,
+    port: parseInt(MAIL_SENDER_PORT as string, 10),
+    secure: MAIL_SENDER_IS_SECURE === 'true',
+    auth: {
+      user: MAIL_SENDER_EMAIL,
+      pass: MAIL_SENDER_PASSWORD,
+    },
+  });
 
   const msg = {
     to: this.personalEmail,
-    from: MAILER_EMAIL as string,
+    from: MAIL_SENDER_EMAIL,
     subject: '멋쟁이 사자처럼 명지대(자연) 회원 승인 완료',
     html: `
       <p>안녕하세요 <strong>${this.name}</strong>님,</p>
@@ -202,13 +251,9 @@ UserSchema.methods.approve = async function () {
   try {
     await this.save();
 
-    await sgMail.send(msg);
+    await transporter.sendMail(msg);
   } catch (e) {
     console.error(e);
-
-    if (e.response) {
-      console.error(e.response.body);
-    }
   }
 };
 
