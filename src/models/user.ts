@@ -2,9 +2,38 @@ import { WebClient } from '@slack/web-api';
 import bcrypt from 'bcrypt';
 import console from 'consola';
 import cryptoRandomString from 'crypto-random-string';
+import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import mongoose, { Document, Schema } from 'mongoose';
 import nodemailer from 'nodemailer';
+
+dotenv.config();
+
+const {
+  SLACK_TOKEN,
+  SLACK_CHANNEL_ID,
+  MAIL_SENDER_SERVICE,
+  MAIL_SENDER_HOST,
+  MAIL_SENDER_PORT,
+  MAIL_SENDER_IS_SECURE,
+  MAIL_SENDER_EMAIL,
+  MAIL_SENDER_PASSWORD,
+  ADMIN_EMAIL,
+} = process.env;
+
+['SERVICE', 'HOST', 'PORT', 'IS_SECURE', 'EMAIL', 'PASSWORD'].forEach(v => {
+  if (!process.env[`MAIL_SENDER_${v}`]) {
+    throw Error(`MAIL_SENDER_${v}이(가) 존재하지 않습니다.`);
+  }
+});
+['TOKEN', 'CHANNEL_ID'].forEach(v => {
+  if (!process.env[`SLACK_${v}`]) {
+    throw Error(`SLACK_${v}이(가) 존재하지 않습니다.`);
+  }
+});
+if (!ADMIN_EMAIL) {
+  throw Error('ADMIN_EMAIL이 존재하지 않습니다.');
+}
 
 // mongoose does not suppoort TypeScript officially. Reference below.
 // https://medium.com/@agentwhs/complete-guide-for-typescript-for-mongoose-for-node-js-8cc0a7e470c1
@@ -106,15 +135,6 @@ UserSchema.methods.generateToken = function (): boolean | string {
 };
 
 UserSchema.methods.sendEmailToken = async function () {
-  const {
-    MAIL_SENDER_SERVICE,
-    MAIL_SENDER_HOST,
-    MAIL_SENDER_PORT,
-    MAIL_SENDER_IS_SECURE,
-    MAIL_SENDER_EMAIL,
-    MAIL_SENDER_PASSWORD,
-  } = process.env;
-
   const transporter = nodemailer.createTransport({
     service: MAIL_SENDER_SERVICE,
     host: MAIL_SENDER_HOST,
@@ -156,18 +176,6 @@ UserSchema.methods.sendEmailToken = async function () {
 };
 
 UserSchema.methods.sendNotiToAdmin = async function () {
-  const {
-    SLACK_TOKEN,
-    SLACK_CHANNEL_ID,
-    MAIL_SENDER_SERVICE,
-    MAIL_SENDER_HOST,
-    MAIL_SENDER_PORT,
-    MAIL_SENDER_IS_SECURE,
-    MAIL_SENDER_EMAIL,
-    MAIL_SENDER_PASSWORD,
-    ADMIN_EMAIL,
-  } = process.env;
-
   const transporter = nodemailer.createTransport({
     service: MAIL_SENDER_SERVICE,
     host: MAIL_SENDER_HOST,
@@ -212,15 +220,6 @@ UserSchema.methods.sendNotiToAdmin = async function () {
 };
 
 UserSchema.methods.approve = async function () {
-  const {
-    MAIL_SENDER_SERVICE,
-    MAIL_SENDER_HOST,
-    MAIL_SENDER_PORT,
-    MAIL_SENDER_IS_SECURE,
-    MAIL_SENDER_EMAIL,
-    MAIL_SENDER_PASSWORD,
-  } = process.env;
-
   const transporter = nodemailer.createTransport({
     service: MAIL_SENDER_SERVICE,
     host: MAIL_SENDER_HOST,
