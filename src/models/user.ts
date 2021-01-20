@@ -15,25 +15,28 @@ const {
   MAIL_SENDER_SERVICE,
   MAIL_SENDER_HOST,
   MAIL_SENDER_PORT,
-  MAIL_SENDER_IS_SECURE,
-  MAIL_SENDER_EMAIL,
-  MAIL_SENDER_PASSWORD,
+  OAUTH_USER,
+  OAUTH_CLIENT_ID,
+  OAUTH_CLIENT_SECRET,
+  OAUTH_REFRESH_TOKEN,
   ADMIN_EMAIL,
 } = process.env;
 
-['SERVICE', 'HOST', 'PORT', 'IS_SECURE', 'EMAIL', 'PASSWORD'].forEach(v => {
-  if (!process.env[`MAIL_SENDER_${v}`]) {
-    throw Error(`MAIL_SENDER_${v}이(가) 존재하지 않습니다.`);
-  }
-});
 ['TOKEN', 'CHANNEL_ID'].forEach(v => {
   if (!process.env[`SLACK_${v}`]) {
     throw Error(`SLACK_${v}이(가) 존재하지 않습니다.`);
   }
 });
-if (!ADMIN_EMAIL) {
-  throw Error('ADMIN_EMAIL이 존재하지 않습니다.');
-}
+['SERVICE', 'HOST', 'PORT'].forEach(v => {
+  if (!process.env[`MAIL_SENDER_${v}`]) {
+    throw Error(`MAIL_SENDER_${v}이(가) 존재하지 않습니다.`);
+  }
+});
+['USER', 'CLIENT_ID', 'CLIENT_SECRET', 'REFRESH_TOKEN'].forEach(v => {
+  if (!process.env[`OAUTH_${v}`]) {
+    throw Error(`OAUTH_${v}이(가) 존재하지 않습니다.`);
+  }
+});
 
 // mongoose does not suppoort TypeScript officially. Reference below.
 // https://medium.com/@agentwhs/complete-guide-for-typescript-for-mongoose-for-node-js-8cc0a7e470c1
@@ -139,16 +142,19 @@ UserSchema.methods.sendEmailToken = async function () {
     service: MAIL_SENDER_SERVICE,
     host: MAIL_SENDER_HOST,
     port: parseInt(MAIL_SENDER_PORT as string, 10),
-    secure: MAIL_SENDER_IS_SECURE === 'true',
+    secure: true,
     auth: {
-      user: MAIL_SENDER_EMAIL,
-      pass: MAIL_SENDER_PASSWORD,
+      type: 'OAuth2',
+      user: OAUTH_USER,
+      clientId: OAUTH_CLIENT_ID,
+      clientSecret: OAUTH_CLIENT_SECRET,
+      refreshToken: OAUTH_REFRESH_TOKEN,
     },
   });
 
   const msg = {
     to: this.personalEmail,
-    from: MAIL_SENDER_EMAIL,
+    from: OAUTH_USER,
     subject: '멋쟁이 사자처럼 at 명지대(자연) 이메일 인증',
     html: ` 
     <h1>안녕하세요, ${this.name}님!</h1>
@@ -180,10 +186,13 @@ UserSchema.methods.sendNotiToAdmin = async function () {
     service: MAIL_SENDER_SERVICE,
     host: MAIL_SENDER_HOST,
     port: parseInt(MAIL_SENDER_PORT as string, 10),
-    secure: MAIL_SENDER_IS_SECURE === 'true',
+    secure: true,
     auth: {
-      user: MAIL_SENDER_EMAIL,
-      pass: MAIL_SENDER_PASSWORD,
+      type: 'OAuth2',
+      user: OAUTH_USER,
+      clientId: OAUTH_CLIENT_ID,
+      clientSecret: OAUTH_CLIENT_SECRET,
+      refreshToken: OAUTH_REFRESH_TOKEN,
     },
   });
 
@@ -194,7 +203,7 @@ UserSchema.methods.sendNotiToAdmin = async function () {
   // Mail to President
   const msg = {
     to: ADMIN_EMAIL,
-    from: MAIL_SENDER_EMAIL,
+    from: OAUTH_USER,
     subject: '멋쟁이 사자처럼 명지대(자연) 회원가입 요청',
     html: `
       ${this.name} 님이 이메일 인증을 완료하였습니다.
@@ -224,16 +233,19 @@ UserSchema.methods.approve = async function () {
     service: MAIL_SENDER_SERVICE,
     host: MAIL_SENDER_HOST,
     port: parseInt(MAIL_SENDER_PORT as string, 10),
-    secure: MAIL_SENDER_IS_SECURE === 'true',
+    secure: true,
     auth: {
-      user: MAIL_SENDER_EMAIL,
-      pass: MAIL_SENDER_PASSWORD,
+      type: 'OAuth2',
+      user: OAUTH_USER,
+      clientId: OAUTH_CLIENT_ID,
+      clientSecret: OAUTH_CLIENT_SECRET,
+      refreshToken: OAUTH_REFRESH_TOKEN,
     },
   });
 
   const msg = {
     to: this.personalEmail,
-    from: MAIL_SENDER_EMAIL,
+    from: OAUTH_USER,
     subject: '멋쟁이 사자처럼 명지대(자연) 회원 승인 완료',
     html: `
       <p>안녕하세요 <strong>${this.name}</strong>님,</p>
