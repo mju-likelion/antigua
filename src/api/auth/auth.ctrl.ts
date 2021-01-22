@@ -264,12 +264,13 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
   const { id } = ctx.params;
 
   // TODO: 비밀번호 업데이트
-  // TODO: 이메일 업데이트
 
   // Request body 검증용 schema
   const schema = Joi.object().keys({
     name: Joi.string().min(2).max(4),
     cellPhone: Joi.string().pattern(/\b\d{11,11}\b/),
+    personalEmail: Joi.string().email(),
+    likelionEmail: Joi.string().pattern(/@likelion.org\b/),
     gender: Joi.string().valid('male', 'female'),
     sid: Joi.string().pattern(/\b\d{8,8}\b/),
     major: Joi.string().min(2),
