@@ -271,6 +271,8 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
     cellPhone: Joi.string().pattern(/\b\d{11,11}\b/),
     personalEmail: Joi.string().email(),
     likelionEmail: Joi.string().pattern(/@likelion.org\b/),
+    oldPassword: Joi.string().min(8),
+    newPassword: Joi.string().min(8),
     gender: Joi.string().valid('male', 'female'),
     sid: Joi.string().pattern(/\b\d{8,8}\b/),
     major: Joi.string().min(2),
