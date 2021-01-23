@@ -15,6 +15,6 @@ auth.get('/check', checkLoggedIn, authCtrl.check);
 auth.post('/logout', checkLoggedIn, authCtrl.logout);
 
 auth.post('/email-check/:id/:token', checkObjectId, authCtrl.emailCheck);
-auth.patch('/modify', checkLoggedIn, checkObjectId, authCtrl.modify);
+auth.patch('/modify', checkLoggedIn, authCtrl.modify);
 
 export default auth;
