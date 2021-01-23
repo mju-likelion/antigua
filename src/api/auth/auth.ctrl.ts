@@ -259,9 +259,9 @@ export const emailCheck = async (ctx: RouterContext): Promise<void> => {
 };
 
 // 계정 정보 수정
-// PATCH /api/auth/:id
+// PATCH /api/auth/modify
 export const modify = async (ctx: RouterContext): Promise<void> => {
-  const { id } = ctx.params;
+  const { id } = ctx.state.user;
 
   // TODO: 비밀번호 업데이트
 
