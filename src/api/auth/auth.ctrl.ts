@@ -298,7 +298,7 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
     return;
   }
 
-  const { oldPassword, newPassword } = result.value;
+  const { personalEmail, oldPassword, newPassword } = result.value;
 
   try {
     const user = await User.findByIdAndUpdate(id, ctx.request.body, {
@@ -332,6 +332,13 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
     } else if (oldPassword) {
       ctx.status = 400; // Bad request
       return;
+    }
+
+    if (personalEmail) {
+      user.generateEmailToken();
+      user.emailConfirmed = false;
+      await user.sendEmailToken();
+      await user.save();
     }
 
     ctx.body = user.serialize();
