@@ -267,8 +267,6 @@ export const emailCheck = async (ctx: RouterContext): Promise<void> => {
 export const modify = async (ctx: RouterContext): Promise<void> => {
   const { id } = ctx.state.user;
 
-  // TODO: 비밀번호 업데이트
-
   // Request body 검증용 schema
   const schema = Joi.object().keys({
     name: Joi.string().min(2).max(4),
@@ -300,14 +298,36 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
     return;
   }
 
+  const { oldPassword, newPassword } = result.value;
+
   try {
     const user = await User.findByIdAndUpdate(id, ctx.request.body, {
       new: true, // true면 업데이트 이후의 값을, false면 업데이트 이전의 값을 반환함
     });
+
     if (!user) {
       ctx.status = 404;
       return;
     }
+
+    if (newPassword) {
+      if (oldPassword) {
+        const isPwCorrect = await user.checkPassword(oldPassword);
+        if (!isPwCorrect) {
+          ctx.status = 401; // Unauthorized
+          return;
+        }
+        await user.setPassword(newPassword);
+        await user.save();
+      } else {
+        ctx.status = 400; // Bad request
+        return;
+      }
+    } else if (oldPassword) {
+      ctx.status = 400; // Bad request
+      return;
+    }
+
     ctx.body = user.serialize();
   } catch (e) {
     ctx.throw(500, e);
