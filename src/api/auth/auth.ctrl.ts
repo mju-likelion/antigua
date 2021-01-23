@@ -277,7 +277,9 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
     activity: Joi.array().items(
       Joi.object({
         generation: Joi.number().required(),
-        position: Joi.string().valid('normal', 'manager', 'chief').required(),
+        position: Joi.string()
+          .valid('member', 'manager', 'president', 'vicepresident')
+          .required(),
       }).required(),
     ),
     github: Joi.string(),
