@@ -301,14 +301,9 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
   const { personalEmail, oldPassword, newPassword } = result.value;
 
   try {
-    const user = await User.findByIdAndUpdate(id, ctx.request.body, {
+    const user = (await User.findByIdAndUpdate(id, ctx.request.body, {
       new: true, // true면 업데이트 이후의 값을, false면 업데이트 이전의 값을 반환함
-    });
-
-    if (!user) {
-      ctx.status = 404;
-      return;
-    }
+    })) as IUser;
 
     if (newPassword) {
       if (oldPassword) {
