@@ -249,7 +249,11 @@ export const emailCheck = async (ctx: RouterContext): Promise<void> => {
 
     user.emailToken = '';
     user.emailConfirmed = true;
-    await user.sendNotiToAdmin();
+
+    if (!user.accountConfirmed) {
+      await user.sendNotiToAdmin();
+    }
+
     await user.save();
 
     ctx.body = user.serialize();
