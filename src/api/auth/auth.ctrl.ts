@@ -281,6 +281,7 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
       }).required(),
     ),
     github: Joi.string(),
+    company: Joi.string(),
   });
 
   // 양식이 맞지 않으면 400 에러
