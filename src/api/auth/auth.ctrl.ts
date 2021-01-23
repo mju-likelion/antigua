@@ -312,11 +312,17 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
 
     if (newPassword) {
       if (oldPassword) {
+        if (oldPassword === newPassword) {
+          ctx.status = 409;
+          return;
+        }
+
         const isPwCorrect = await user.checkPassword(oldPassword);
         if (!isPwCorrect) {
           ctx.status = 401; // Unauthorized
           return;
         }
+
         await user.setPassword(newPassword);
         await user.save();
       } else {
