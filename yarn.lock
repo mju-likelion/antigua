@@ -1705,11 +1705,6 @@ http-cache-semantics@^4.0.0:
   resolved "https://registry.yarnpkg.com/http-cache-semantics/-/http-cache-semantics-4.1.0.tgz#49e91c5cbf36c9b94bcfcd71c23d5249ec74e390"
   integrity sha512-carPklcUh7ROWRK7Cv27RPtdhYhUsela/ue5/jKzjegVvXDqM2ILE9Q2BGn9JZJh1g87cp56su/FgQSzcWS8cQ==
 
-http-content-range-format@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/http-content-range-format/-/http-content-range-format-1.0.0.tgz#1fa2851f24d297575af7a1488d63de02e4b84378"
-  integrity sha1-H6KFHyTSl1da96FIjWPeAuS4Q3g=
-
 http-errors@1.7.3, http-errors@~1.7.2:
   version "1.7.3"
   resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-1.7.3.tgz#6c619e4f9c60308c38519498c14fbb10aacebb06"
@@ -2109,16 +2104,6 @@ koa-convert@^1.2.0:
   dependencies:
     co "^4.6.0"
     koa-compose "^3.0.0"
-
-koa-pagination@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/koa-pagination/-/koa-pagination-4.0.0.tgz#ed94d131a0225edac2ce32cb7d7c498fa08f83b9"
-  integrity sha512-sFBC7gny11D+8S5GYZwSskmrY9Wa8QCvbgB+XvEn8mtl3P5eNbjqaUlh+3mxcJ5s3xdqc2zf2jz0XuRa8OGa8g==
-  dependencies:
-    debug "^4.1.1"
-    http-content-range-format "^1.0.0"
-    range-specifier-parser "^1.0.2"
-    standard-http-error "^2.0.1"
 
 koa-router@^9.4.0:
   version "9.4.0"
@@ -2987,11 +2972,6 @@ qs@^6.5.2:
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.4.tgz#9090b290d1f91728d3c22e54843ca44aea5ab687"
   integrity sha512-A1kFqHekCTM7cz0udomYUoYNWjBebHm/5wzU/XqrBRBNWectVH0QIiN+NEcZ0Dte5hvzHwbr8+XQmguPhJ6WdQ==
 
-range-specifier-parser@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/range-specifier-parser/-/range-specifier-parser-1.0.2.tgz#ad89b7faf725838cb0cabfe9b09b6837c10002c8"
-  integrity sha1-rYm3+vclg4ywyr/psJtoN8EAAsg=
-
 raw-body@^2.3.3:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/raw-body/-/raw-body-2.4.1.tgz#30ac82f98bb5ae8c152e67149dac8d55153b168c"
@@ -3328,18 +3308,6 @@ sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
-
-"standard-error@>= 1.1.0 < 2":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/standard-error/-/standard-error-1.1.0.tgz#23e5168fa1c0820189e5812701a79058510d0d34"
-  integrity sha1-I+UWj6HAggGJ5YEnAaeQWFENDTQ=
-
-standard-http-error@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/standard-http-error/-/standard-http-error-2.0.1.tgz#f8ae9172e3cef9cb38d2e7084a1925f57a7c34bd"
-  integrity sha1-+K6RcuPO+cs40ucIShkl9Xp8NL0=
-  dependencies:
-    standard-error ">= 1.1.0 < 2"
 
 "statuses@>= 1.5.0 < 2", statuses@^1.5.0:
   version "1.5.0"
