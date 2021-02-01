@@ -23,7 +23,9 @@ export const userList = async (ctx: RouterContext): Promise<void> => {
         .limit(numPage)
         .skip((page - 1) * numPage)
         .exec()) || [];
+    const userCount = await User.countDocuments().exec();
 
+    ctx.set('Last-Page', Math.ceil(userCount / numPage).toString());
     ctx.body = users.map((user: IUser) => {
       const userObj = user.serialize();
       return {
