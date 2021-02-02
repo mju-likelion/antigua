@@ -12,7 +12,6 @@ auth.get('/user-detail/:id', checkLoggedIn, checkObjectId, authCtrl.userDetail);
 auth.post('/register', authCtrl.register);
 auth.post('/login', authCtrl.login);
 auth.get('/check', checkLoggedIn, authCtrl.check);
-auth.post('/logout', checkLoggedIn, authCtrl.logout);
 
 auth.post('/email-check/:id/:token', checkObjectId, authCtrl.emailCheck);
 auth.patch('/modify', checkLoggedIn, authCtrl.modify);

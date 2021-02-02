@@ -11,7 +11,7 @@ type DecodedJWT = {
 };
 
 const jwtMiddleware = async (ctx: Context, next: Next): Promise<any> => {
-  const token = ctx.cookies.get('access_token');
+  const token = ctx.get('access_token');
   if (!token) return next();
 
   try {
@@ -33,10 +33,7 @@ const jwtMiddleware = async (ctx: Context, next: Next): Promise<any> => {
 
       if (!user || !reGenerateToken) throw Error;
 
-      ctx.cookies.set('access_token', reGenerateToken, {
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-        httpOnly: true,
-      });
+      ctx.set('access_token', reGenerateToken);
     }
 
     return next();
