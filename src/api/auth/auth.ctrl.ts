@@ -214,13 +214,6 @@ export const check = async (ctx: RouterContext): Promise<void> => {
   ctx.body = user;
 };
 
-// 로그아웃
-// POST /api/auth/logout
-export const logout = async (ctx: RouterContext): Promise<void> => {
-  ctx.cookies.set('access_token');
-  ctx.status = 204; // No content
-};
-
 // 이메일 검증
 // POST /api/auth/email-check/:id/:token
 export const emailCheck = async (ctx: RouterContext): Promise<void> => {
