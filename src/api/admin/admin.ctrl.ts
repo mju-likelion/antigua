@@ -1,6 +1,8 @@
+import Joi from 'joi';
 import { RouterContext } from 'koa-router';
 
 import Admin from '../../models/admin';
+import ErrorCode, { IErrorCodeSchema } from '../../models/errorCode';
 import User, { IUser } from '../../models/user';
 
 // 미승인 회원 목록
@@ -67,6 +69,40 @@ export const toAdmin = async (ctx: RouterContext): Promise<void> => {
     await admin.save();
 
     ctx.body = user.serialize();
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+export const initErrorCode = async (ctx: RouterContext): Promise<void> => {
+  const schema = Joi.array().items(
+    Joi.object().keys({
+      errorCode: Joi.string().required(),
+      httpStatus: Joi.number().integer().required(),
+      message: Joi.string().required(),
+    }),
+  );
+
+  const result = schema.validate(ctx.request.body);
+  if (result.error) {
+    ctx.status = 400;
+    ctx.body = {
+      errorCode: 'ERR_B002',
+      message: '입력 양식이 맞지 않습니다.',
+      joi: result.error,
+    };
+    return;
+  }
+
+  const errorCodes: Array<IErrorCodeSchema> = ctx.request.body;
+
+  try {
+    errorCodes.forEach(async (ec: IErrorCodeSchema) => {
+      const errorCode = new ErrorCode(ec);
+      await errorCode.save();
+    });
+
+    ctx.body = 'Error codes successfully initialized';
   } catch (e) {
     ctx.throw(500, e);
   }
