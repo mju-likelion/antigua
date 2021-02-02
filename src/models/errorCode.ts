@@ -6,15 +6,24 @@ const ErrorCodeSchema = new Schema({
   message: { type: String, required: true },
 });
 
-export interface IErrorCodeSchema extends Document {
+interface IErrorCodeSchema extends Document {
   errorCode: string;
   httpStatus: number;
   message: string;
 }
 
-const ErrorCode = mongoose.model<IErrorCodeSchema>(
-  'ErrorCode',
-  ErrorCodeSchema,
-);
+ErrorCodeSchema.methods.serialize = function () {
+  const data = this.toJSON();
+  return {
+    errorCode: data.errorCode,
+    message: data.message,
+  };
+};
+
+export interface IErrorCode extends IErrorCodeSchema {
+  serialize: () => { errorCode: string; message: string };
+}
+
+const ErrorCode = mongoose.model<IErrorCode>('ErrorCode', ErrorCodeSchema);
 
 export default ErrorCode;

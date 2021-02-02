@@ -2,7 +2,7 @@ import Joi from 'joi';
 import { RouterContext } from 'koa-router';
 
 import Admin from '../../models/admin';
-import ErrorCode, { IErrorCodeSchema } from '../../models/errorCode';
+import ErrorCode, { IErrorCode } from '../../models/errorCode';
 import User, { IUser } from '../../models/user';
 
 // 미승인 회원 목록
@@ -94,10 +94,10 @@ export const initErrorCode = async (ctx: RouterContext): Promise<void> => {
     return;
   }
 
-  const errorCodes: Array<IErrorCodeSchema> = ctx.request.body;
+  const errorCodes: Array<IErrorCode> = ctx.request.body;
 
   try {
-    errorCodes.forEach(async (ec: IErrorCodeSchema) => {
+    errorCodes.forEach(async (ec: IErrorCode) => {
       const errorCode = new ErrorCode(ec);
       await errorCode.save();
     });
