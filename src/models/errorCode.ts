@@ -1,12 +1,12 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 const ErrorCodeSchema = new Schema({
-  errorCode: { type: String, required: true },
+  errorCode: { type: String, required: true, unique: true },
   httpStatus: { type: Number, required: true },
   message: { type: String, required: true },
 });
 
-interface IErrorCodeSchema extends Document {
+export interface IErrorCodeSchema extends Document {
   errorCode: string;
   httpStatus: number;
   message: string;

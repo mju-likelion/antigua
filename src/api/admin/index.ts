@@ -26,4 +26,8 @@ admin.post(
 // TODO: 운영진 등록 후 반드시 지울 것!
 admin.post('/to-admin', checkLoggedIn, adminCtrl.toAdmin);
 
+// ErrorCode Initialization (개구멍 하나 더 팜)
+// TODO: release 브랜치로 배포 시에는 반드시 지울 것!
+admin.post('/init-error-code', checkLoggedIn, adminCtrl.initErrorCode);
+
 export default admin;
