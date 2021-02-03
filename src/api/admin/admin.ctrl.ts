@@ -57,18 +57,13 @@ export const toAdmin = async (ctx: RouterContext): Promise<void> => {
   try {
     const user = await User.findById(ctx.state.user.id);
 
-    if (!user) {
-      ctx.status = 401;
-      return;
-    }
-
     const admin = new Admin({
       userId: user,
     });
 
     await admin.save();
 
-    ctx.body = user.serialize();
+    ctx.body = user?.serialize();
   } catch (e) {
     ctx.throw(500, e);
   }
