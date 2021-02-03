@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 
 import api from './api';
 import jwtMiddleware from './lib/jwtMiddleware';
+import ErrorCode from './models/errorCode';
 
 // process.env.*을 통해 .env파일에 접근을 허용
 dotenv.config();
@@ -17,15 +18,22 @@ const { PORT, MONGO_URI } = process.env;
 // DB 연결
 async function connectDB() {
   try {
-    await mongoose.connect(
-      MONGO_URI || 'mongodb://localhost:27017/mjuLikelionDB',
-      {
-        useCreateIndex: true,
-        useFindAndModify: false,
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      },
-    );
+    await mongoose.connect(MONGO_URI || 'mongodb://localhost:27017/antigua', {
+      useCreateIndex: true,
+      useFindAndModify: false,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    const errorCodeCount = await ErrorCode.countDocuments().exec();
+    if (errorCodeCount === 0) {
+      consola.warn(
+        'Error codes do not exist. \n' +
+          'Please initialize error codes by using API or MongoDB manually. \n' +
+          'Unless every error responses will throw internal server error.',
+      );
+    }
+
     consola.success('Connected to MongoDB');
   } catch (e) {
     console.error(e);
