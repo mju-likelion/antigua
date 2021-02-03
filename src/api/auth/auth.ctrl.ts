@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import { RouterContext } from 'koa-router';
 
+import ErrorCode from '../../models/errorCode';
 import User, { IUser } from '../../models/user';
 
 // 회원정보 조회
@@ -11,7 +12,9 @@ export const userList = async (ctx: RouterContext): Promise<void> => {
   const page = parseInt(ctx.query.page || '1', 10);
 
   if (page < 1) {
-    ctx.status = 400;
+    const errb003 = await ErrorCode.findOne({ errorCode: 'ERR_B003' });
+    ctx.status = errb003?.httpStatus as number;
+    ctx.body = errb003?.serialize();
     return;
   }
 
@@ -49,7 +52,9 @@ export const userDetail = async (ctx: RouterContext): Promise<void> => {
     const user = await User.findById({ _id: id });
     // 해당 id로 계정이 존재하지 않으면
     if (!user) {
-      ctx.status = 404; // Not found
+      const errn001 = await ErrorCode.findOne({ errorCode: 'ERR_N001' });
+      ctx.status = errn001?.httpStatus as number;
+      ctx.body = errn001?.serialize();
       return;
     }
 
@@ -285,8 +290,12 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
   // 양식이 맞지 않으면 400 에러
   const result = schema.validate(ctx.request.body);
   if (result.error) {
-    ctx.status = 400;
-    ctx.body = result.error;
+    const errb002 = await ErrorCode.findOne({ errorCode: 'ERR_B002' });
+    ctx.status = errb002?.httpStatus as number;
+    ctx.body = {
+      ...errb002?.serialize(),
+      joi: result.error,
+    };
     return;
   }
 
@@ -300,24 +309,36 @@ export const modify = async (ctx: RouterContext): Promise<void> => {
     if (newPassword) {
       if (oldPassword) {
         if (oldPassword === newPassword) {
-          ctx.status = 409;
+          // 새 비밀번호와 기존 비밀번호가 같을 때
+          const errc002 = await ErrorCode.findOne({ errorCode: 'ERR_C002' });
+          ctx.status = errc002?.httpStatus as number;
+          ctx.body = errc002?.serialize();
           return;
         }
 
         const isPwCorrect = await user.checkPassword(oldPassword);
         if (!isPwCorrect) {
-          ctx.status = 401; // Unauthorized
+          // 기존 비밀번호 입력이 틀렸을 때
+          const erru004 = await ErrorCode.findOne({ errorCode: 'ERR_U004' });
+          ctx.status = erru004?.httpStatus as number;
+          ctx.body = erru004?.serialize();
           return;
         }
 
         await user.setPassword(newPassword);
         await user.save();
       } else {
-        ctx.status = 400; // Bad request
+        // 새 비밀번호는 입력했지만 기존 비밀번호를 입력하지 않았을 때
+        const errb002 = await ErrorCode.findOne({ errorCode: 'ERR_B002' });
+        ctx.status = errb002?.httpStatus as number;
+        ctx.body = errb002?.serialize();
         return;
       }
     } else if (oldPassword) {
-      ctx.status = 400; // Bad request
+      // 기존 비밀번호는 입력했지만 새 비밀번호를 입력하지 않았을 때
+      const errb002 = await ErrorCode.findOne({ errorCode: 'ERR_B002' });
+      ctx.status = errb002?.httpStatus as number;
+      ctx.body = errb002?.serialize();
       return;
     }
 
