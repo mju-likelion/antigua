@@ -74,6 +74,9 @@ export const toAdmin = async (ctx: RouterContext): Promise<void> => {
   }
 };
 
+// ErrorCode 초기화
+// POST /api/admin/init-error-code
+// TODO: 정식 배포 시에는 반드시 지울 것!
 export const initErrorCode = async (ctx: RouterContext): Promise<void> => {
   const schema = Joi.array().items(
     Joi.object().keys({
