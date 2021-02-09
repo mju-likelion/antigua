@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import { RouterContext } from 'koa-router';
 
+import generateError from '../../lib/errGenerator';
 import Admin from '../../models/admin';
 import ErrorCode, { IErrorCode } from '../../models/errorCode';
 import User, { IUser } from '../../models/user';
@@ -28,17 +29,20 @@ export const approve = async (ctx: RouterContext): Promise<void> => {
     const user = await User.findById(id);
 
     if (!user) {
-      ctx.status = 404;
+      // id does not exist
+      await generateError(ctx, 'ERR_N001');
       return;
     }
 
     if (!user.emailConfirmed) {
-      ctx.status = 401;
+      // email does not confirmed
+      await generateError(ctx, 'ERR_F002');
       return;
     }
 
     if (user.accountConfirmed) {
-      ctx.status = 409;
+      // account is already confirmed
+      await generateError(ctx, 'ERR_C003');
       return;
     }
 
