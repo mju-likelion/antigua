@@ -90,28 +90,28 @@ export const register = async (ctx: RouterContext): Promise<void> => {
     github: Joi.string(),
   });
 
-  // 양식이 맞지 않으면 400 에러
   const result = schema.validate(ctx.request.body);
-  if (result.error) {
-    ctx.status = 400;
-    ctx.body = result.error;
-    return;
-  }
-
-  const {
-    name,
-    cellPhone,
-    personalEmail,
-    likelionEmail,
-    password,
-    gender,
-    sid,
-    major,
-    activity,
-    github,
-  } = ctx.request.body;
 
   try {
+    if (result.error) {
+      // input format does not match
+      await generateError(ctx, 'ERR_B002');
+      return;
+    }
+
+    const {
+      name,
+      cellPhone,
+      personalEmail,
+      likelionEmail,
+      password,
+      gender,
+      sid,
+      major,
+      activity,
+      github,
+    } = ctx.request.body;
+
     // 입력받은 것과 같은 폰 번호, 이메일, 학번, github를 가진 사람 찾기
     const cellPhoneExist = await User.findOne({ cellPhone });
     const personalEmailExist = await User.findOne({ personalEmail });
@@ -119,7 +119,6 @@ export const register = async (ctx: RouterContext): Promise<void> => {
     const sidExist = await User.findOne({ sid });
     const githubExist = await User.findOne({ github });
 
-    // 만약 같은 폰 번호, 이메일, 학번, github를 가진 사람이 있다면
     if (
       cellPhoneExist ||
       personalEmailExist ||
@@ -127,7 +126,8 @@ export const register = async (ctx: RouterContext): Promise<void> => {
       sidExist ||
       githubExist
     ) {
-      ctx.status = 409; // Conflict
+      // already has the same phone number, email, student ID, and github
+      await generateError(ctx, 'ERR_C001');
       return;
     }
 
@@ -162,30 +162,34 @@ export const login = async (ctx: RouterContext): Promise<void> => {
     password: Joi.string().min(8).required(),
   });
 
-  // 양식이 맞지 않으면 400 에러
   const result = schema.validate(ctx.request.body);
-  if (result.error) {
-    ctx.status = 400;
-    ctx.body = result.error;
-    return;
-  }
-
-  const { email, password } = ctx.request.body;
 
   try {
+    if (result.error) {
+      // input format does not match
+      await generateError(ctx, 'ERR_B002');
+      return;
+    }
+
+    const { email, password } = ctx.request.body;
     const user = await User.findOne({ personalEmail: email });
     const valid = await user?.checkPassword(password);
-    // 해당 email을 가진 user가 존재하지 않거나
-    // 비밀번호가 일치하지 않으면
-    if (!user || !valid) {
-      ctx.status = 401; // Unauthorized
-      ctx.body = 'Email is not exist or password is not match.';
+
+    if (!user) {
+      // email does not exist
+      await generateError(ctx, 'ERR_U003');
+      return;
+    }
+
+    if (!valid) {
+      // email does not match
+      await generateError(ctx, 'ERR_U004');
       return;
     }
 
     if (!user.emailConfirmed) {
-      ctx.status = 401; // Unauthorized
-      ctx.body = 'You must confirm your email first.';
+      // email does not verify
+      await generateError(ctx, 'ERR_F002');
       return;
     }
 
@@ -204,12 +208,18 @@ export const login = async (ctx: RouterContext): Promise<void> => {
 // GET /api/auth/check
 export const check = async (ctx: RouterContext): Promise<void> => {
   const { user } = ctx.state;
-  // 로그인 중이 아니라면
-  if (!user) {
-    ctx.status = 401; // Unauthorized
-    return;
+
+  try {
+    if (!user) {
+      // not logged in
+      await generateError(ctx, 'ERR_U001');
+      return;
+    }
+
+    ctx.body = user;
+  } catch (e) {
+    ctx.throw(500, e);
   }
-  ctx.body = user;
 };
 
 // 이메일 검증
@@ -220,23 +230,24 @@ export const emailCheck = async (ctx: RouterContext): Promise<void> => {
   const schema = Joi.string().length(32);
   const result = schema.validate(token);
 
-  if (result.error) {
-    ctx.status = 400;
-    ctx.body = result.error;
-    return;
-  }
-
   try {
-    const user = await User.findById({ _id: id });
-    // 해당 id로 계정이 존재하지 않으면
-    if (!user) {
-      ctx.status = 404; // Not found
+    if (result.error) {
+      // input format does not match
+      await generateError(ctx, 'ERR_B002');
       return;
     }
 
-    // 이메일 토큰이 맞지 않으면
+    const user = await User.findById({ _id: id });
+
+    if (!user) {
+      // id does not exist
+      await generateError(ctx, 'ERR_N001');
+      return;
+    }
+
     if (user.emailToken !== token) {
-      ctx.status = 401; // Unauthorized
+      // email token does not match
+      await generateError(ctx, 'ERR_U002');
       return;
     }
 
