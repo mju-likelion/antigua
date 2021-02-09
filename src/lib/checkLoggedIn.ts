@@ -1,19 +1,21 @@
 import { Next } from 'koa';
 import { RouterContext } from 'koa-router';
 
-import ErrorCode from '../models/errorCode';
+import generateError from './errGenerator';
 
 const checkLoggedIn = async (ctx: RouterContext, next: Next): Promise<any> => {
   const { user } = ctx.state;
 
-  if (!user) {
-    const erru001 = await ErrorCode.findOne({ errorCode: 'ERR_U001' });
-    ctx.status = erru001?.httpStatus as number;
-    ctx.body = erru001?.serialize();
-    return;
+  try {
+    if (!user) {
+      // not logged in
+      await generateError(ctx, 'ERR_U001');
+      return;
+    }
+    return next();
+  } catch (e) {
+    ctx.throw(500, e);
   }
-
-  return next();
 };
 
 export default checkLoggedIn;
