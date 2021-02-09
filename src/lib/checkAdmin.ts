@@ -2,18 +2,18 @@ import { Next } from 'koa';
 import { RouterContext } from 'koa-router';
 
 import Admin from '../models/admin';
-import ErrorCode from '../models/errorCode';
+
+import generateError from './errGenerator';
 
 const checkAdmin = async (ctx: RouterContext, next: Next): Promise<any> => {
-  try {
-    const { user } = ctx.state;
+  const { user } = ctx.state;
 
+  try {
     const admin = await Admin.findOne({ userId: user.id });
 
     if (!admin) {
-      const errf001 = await ErrorCode.findOne({ errorCode: 'ERR_F001' });
-      ctx.status = errf001?.httpStatus as number;
-      ctx.body = errf001?.serialize();
+      // does not have admin permission
+      await generateError(ctx, 'ERR_F001');
       return;
     }
 
