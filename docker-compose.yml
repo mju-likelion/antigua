@@ -1,0 +1,26 @@
+version: '3'
+services: 
+  app: 
+    container_name: antigua_app
+    restart: always
+    build: .
+    ports: 
+      - '52021:52021'
+    networks: 
+      - antigua_network
+  mongo:
+    container_name: antigua_mongo
+    restart: always
+    image: mongo
+    logging:
+      driver: none
+    volumes:
+      - ./mongo:/data/db
+    ports: 
+      - '47017:27017'
+    networks:
+      - antigua_network
+
+networks:
+  antigua_network:
+   driver: bridge
