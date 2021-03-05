@@ -199,6 +199,14 @@ export const login = async (ctx: RouterContext): Promise<void> => {
     if (!token) throw Error;
 
     ctx.set('access_token', token);
+
+    // verify query string for redirect to admin page login
+    const { admin } = ctx.query;
+    if (admin === 'true') {
+      ctx.status = 308;
+      ctx.redirect('/api/admin/login');
+      return;
+    }
   } catch (e) {
     ctx.throw(500, e);
   }

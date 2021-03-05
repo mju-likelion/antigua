@@ -30,4 +30,6 @@ admin.post('/to-admin', checkLoggedIn, adminCtrl.toAdmin);
 // TODO: release 브랜치로 배포 시에는 반드시 지울 것!
 admin.post('/init-error-code', checkLoggedIn, adminCtrl.initErrorCode);
 
+admin.post('/login', checkLoggedIn, checkAdmin, adminCtrl.login);
+
 export default admin;

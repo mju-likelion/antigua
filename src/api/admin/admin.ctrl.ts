@@ -109,3 +109,10 @@ export const initErrorCode = async (ctx: RouterContext): Promise<void> => {
     ctx.throw(500, e);
   }
 };
+
+export const login = (ctx: RouterContext): void => {
+  ctx.status = 200;
+  ctx.body = {
+    desc: '관리자로 로그인 되었습니다.',
+  };
+};
