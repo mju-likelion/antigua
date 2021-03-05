@@ -9,7 +9,7 @@ const PostSchema = new Schema(
       required: true,
     },
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    title: { type: String, required: true },
+    title: { type: String, required: true, unique: true },
     content: { type: String, required: true },
   },
   {
@@ -30,6 +30,18 @@ interface IPostSchema extends Document {
   content: string;
 }
 
-const Post = model<IPostSchema>('Post', PostSchema);
+PostSchema.methods.serialize = function () {
+  const data = this.toJSON();
+  const content = String(data.content);
+  data.content =
+    content.length > 100 ? `${content.substring(0, 100)}...` : content;
+  return data;
+};
+
+export interface IPost extends IPostSchema {
+  serialize: () => IPostSchema;
+}
+
+const Post = model<IPost>('Post', PostSchema);
 
 export default Post;

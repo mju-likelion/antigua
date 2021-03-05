@@ -2,6 +2,7 @@ import Router from 'koa-router';
 
 import checkAdmin from '../../lib/checkAdmin';
 import checkLoggedIn from '../../lib/checkLoggedIn';
+import checkObjectId from '../../lib/checkObjectId';
 
 import * as postCtrl from './post.ctrl';
 
@@ -14,18 +15,22 @@ post.post(
   postCtrl.addAnnouncement,
 );
 post.patch(
-  '/update-announcement',
+  '/update-announcement/:id',
   checkLoggedIn,
   checkAdmin,
+  checkObjectId,
   postCtrl.updateAnnouncement,
 );
 
 post.post('/add-homework', checkLoggedIn, checkAdmin, postCtrl.addHomework);
 post.patch(
-  '/update-homework',
+  '/update-homework/:id',
   checkLoggedIn,
   checkAdmin,
+  checkObjectId,
   postCtrl.updateHomework,
 );
+
+post.delete('/remove/:id', checkLoggedIn, checkAdmin, postCtrl.remove);
 
 export default post;
