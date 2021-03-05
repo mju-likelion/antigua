@@ -5,7 +5,7 @@ const PostSchema = new Schema(
   {
     kinds: {
       type: String,
-      enum: ['post', 'announcement', 'homework'],
+      enum: ['announcement', 'homework'],
       required: true,
     },
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -21,7 +21,7 @@ const PostSchema = new Schema(
 );
 
 // TypeScript interfaces
-type Kinds = 'post' | 'announcement' | 'homework';
+type Kinds = 'announcement' | 'homework';
 
 interface IPostSchema extends Document {
   kinds: Kinds;

@@ -1,11 +1,11 @@
 import { RouterContext } from 'koa-router';
 
-export const addPost = async (ctx: RouterContext): Promise<void> => {
-  ctx.body = '/api/post/add-post';
+export const addAnnouncement = async (ctx: RouterContext): Promise<void> => {
+  ctx.body = '/api/post/add-announcement';
 };
 
-export const updatePost = async (ctx: RouterContext): Promise<void> => {
-  ctx.body = '/api/post/update-post';
+export const updateAnnouncement = async (ctx: RouterContext): Promise<void> => {
+  ctx.body = '/api/post/update-announcement';
 };
 
 export const addHomework = async (ctx: RouterContext): Promise<void> => {
