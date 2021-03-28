@@ -32,4 +32,6 @@ admin.post('/init-error-code', checkLoggedIn, adminCtrl.initErrorCode);
 
 admin.post('/login', checkLoggedIn, checkAdmin, adminCtrl.login);
 
+admin.post('/approve/:id', checkLoggedIn, checkAdmin, adminCtrl.approve);
+
 export default admin;
