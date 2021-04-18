@@ -20,10 +20,11 @@ export const listUnapproved = async (ctx: RouterContext): Promise<void> => {
   }
 };
 
-// 회원 승인
+// 회원 승인 및 거부
 // POST /api/admin/approve/:id
 export const approve = async (ctx: RouterContext): Promise<void> => {
   const { id } = ctx.params;
+  const { isApprove } = ctx.query;
 
   try {
     const user = await User.findById(id);
@@ -31,6 +32,12 @@ export const approve = async (ctx: RouterContext): Promise<void> => {
     if (!user) {
       // id does not exist
       await generateError(ctx, 'ERR_N001');
+      return;
+    }
+
+    if (isApprove === 'false') {
+      // member approve was rejected
+      await user.deleteOne();
       return;
     }
 
@@ -108,4 +115,11 @@ export const initErrorCode = async (ctx: RouterContext): Promise<void> => {
   } catch (e) {
     ctx.throw(500, e);
   }
+};
+
+export const login = (ctx: RouterContext): void => {
+  ctx.status = 200;
+  ctx.body = {
+    desc: '관리자로 로그인 되었습니다.',
+  };
 };
